@@ -14,11 +14,13 @@ import sys
 try:
         inname = sys.argv[1]
 except IndexError:
+        print("input file and output file missing in command line")
         print("Usage: python trim_uvfits.py <input_file_name> <output_file_name>")
         sys.exit(1)
 try:
         outname = sys.argv[2]
 except IndexError:
+        print("output file missing in command line")
         print("Usage: python trim_uvfits.py <input_file_name> <output_file_name>")
         sys.exit(1)
 hdulist = fits.open(inname)
@@ -37,13 +39,18 @@ new_hdu = fits.GroupsHDU(header=header, data = newdata)
 new_hdu.header['EXTEND']=True
 
 hdulist[0] = new_hdu
-hdulist.writeto(outname, overwrite=False)
+try:
+        hdulist.writeto(outname, overwrite=False)
+except OSError:
+        print("outfile already exists, overwrite not permitted")
+        sys.exit(1)
 # print input file information
-print("Old info:")
+print("Input file info:")
 fits.open(inname).info()
 # print output file information
-print("New info:")
+print("Output file info:")
 newfile = fits.open(outname)
 newfile.info()
-
+# print end message
+print("trim_uvfits ended properly")
         
